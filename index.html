@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cinema – Movie Explorer</title>
+<style>
+:root{--bg:#0e0e12;--card:#1a1a22;--tx:#f2f2f5;--mut:#9a9aa8;--br:#e50914;--bd:#2a2a35}
+[data-theme=light]{--bg:#f7f7fa;--card:#fff;--tx:#16161d;--mut:#666;--bd:#e3e3ea}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,sans-serif;background:var(--bg);color:var(--tx);transition:background .3s,color .3s}
+button,input,textarea{font:inherit;color:inherit}
+.shell{display:flex;min-height:100vh}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:var(--card);border-top:1px solid var(--bd);padding:6px;z-index:5}
+nav a{cursor:pointer;text-align:center;padding:6px 14px;border-radius:12px;font-size:12px;color:var(--mut);transition:.25s}
+nav a span{display:block;font-size:20px}
+nav a.on{background:var(--br);color:#fff}
+nav .logo{display:none}
+main{flex:1;min-width:0;max-width:1200px;margin:0 auto;padding:16px 16px 90px;animation:fade .45s}
+@media(min-width:800px){
+ nav{position:sticky;top:0;height:100vh;width:110px;flex-direction:column;justify-content:flex-start;gap:8px;border-top:0;border-right:1px solid var(--bd);padding-top:16px}
+ nav .logo{display:block;font-size:32px;margin-bottom:12px;text-align:center}
+ main{padding-bottom:24px}}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pop{50%{transform:scale(1.4)}}
+h1{letter-spacing:4px;font-weight:900;margin:0 0 12px}
+.banner{position:relative;border-radius:20px;padding:24px;min-height:170px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;cursor:pointer;overflow:hidden;transition:transform .3s}
+.banner:hover{transform:scale(1.01)}
+.banner::after{content:"🎬";position:absolute;right:20px;top:10px;font-size:80px;opacity:.25}
+.banner h2{margin:6px 0 2px;font-size:clamp(22px,4vw,34px)}
+.tag{background:rgba(0,0,0,.4);padding:3px 10px;border-radius:20px;font-size:12px;align-self:flex-start}
+.inp{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--bd);background:var(--card);margin-top:4px}
+.inp:focus{outline:2px solid var(--br)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0}
+.chip{padding:7px 16px;border-radius:20px;border:1px solid var(--bd);background:var(--card);cursor:pointer;white-space:nowrap;transition:.2s}
+.chip.on{background:var(--br);color:#fff;border-color:var(--br)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+@media(min-width:550px){.grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}}
+.card{position:relative;background:var(--card);border-radius:16px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px #0003;animation:fade .5s backwards;transition:transform .25s,box-shadow .25s}
+.card:hover{transform:translateY(-6px);box-shadow:0 10px 24px #0005}
+.ci{padding:10px;display:flex;flex-direction:column;gap:3px}
+.ci b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+small,.mut{color:var(--mut)}
+.poster{aspect-ratio:2/3;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:8px;gap:6px}
+.poster span{font-size:42px}
+.poster.sm{width:48px;height:48px;aspect-ratio:auto;border-radius:10px;flex:none}
+.poster.sm span{font-size:22px}
+.heart{position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.5);color:#fff;font-size:18px;cursor:pointer}
+.heart.on{color:#ff3b4e;animation:pop .35s}
+.btn{background:var(--br);color:#fff;border:0;padding:12px 22px;border-radius:12px;cursor:pointer;font-weight:600;transition:.2s}
+.btn:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.btn.ghost{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+.btn.on{box-shadow:0 0 18px #ff3b4e88}
+.panel{background:var(--card);border-radius:16px;padding:18px;margin:14px 0}
+.det{display:grid;gap:20px}
+@media(min-width:650px){.det{grid-template-columns:260px 1fr}}
+.det .poster{border-radius:16px}
+.pill{display:inline-block;background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:4px 12px;margin:3px 4px 3px 0;font-size:13px}
+.err{color:#ff5a67;font-size:12.5px;min-height:16px;display:block;margin-bottom:6px}
+label{font-size:13px;color:var(--mut)}
+.row{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:14px;padding:10px;margin-bottom:10px;cursor:pointer;animation:fade .4s}
+.row .x{margin-left:auto;background:0;border:0;font-size:20px;cursor:pointer}
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;background:linear-gradient(135deg,#200122,#6f0000)}
+.login .panel{width:100%;max-width:400px;animation:fade .8s;color:var(--tx)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stats div{text-align:center;font-size:26px}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(30px);background:#222;color:#fff;padding:10px 20px;border-radius:30px;opacity:0;transition:.3s;pointer-events:none;z-index:9}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.empty{text-align:center;padding:60px 0;color:var(--mut)}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const D=[
+[1,'Inception',2010,'Sci-Fi',8.8,148,'Christopher Nolan','Leonardo DiCaprio, Elliot Page, Tom Hardy','A thief who steals secrets through dreams is offered one last job: plant an idea instead.','#1e3c72','#2a5298'],
+[2,'The Dark Knight',2008,'Action',9.0,152,'Christopher Nolan','Christian Bale, Heath Ledger, Aaron Eckhart','Batman faces the Joker, a criminal mastermind who pushes Gotham into chaos.','#232526','#414345'],
+[3,'Interstellar',2014,'Sci-Fi',8.7,169,'Christopher Nolan','Matthew McConaughey, Anne Hathaway, Jessica Chastain','Explorers travel through a wormhole to find a new home for humanity.','#0f2027','#2c5364'],
+[4,'Parasite',2019,'Thriller',8.5,132,'Bong Joon-ho','Song Kang-ho, Choi Woo-shik, Park So-dam','A poor family schemes its way into the lives of a wealthy household.','#134e5e','#71b280'],
+[5,'The Godfather',1972,'Drama',9.2,175,'Francis Ford Coppola','Marlon Brando, Al Pacino, James Caan','The aging patriarch of a crime dynasty hands control to his reluctant son.','#3e2723','#8d6e63'],
+[6,'Spirited Away',2001,'Animation',8.6,125,'Hayao Miyazaki','Rumi Hiiragi, Miyu Irino, Mari Natsuki','A girl wanders into a world of spirits and must work to free her parents.','#ff9966','#ff5e62'],
+[7,'Mad Max: Fury Road',2015,'Action',8.1,120,'George Miller','Tom Hardy, Charlize Theron, Nicholas Hoult','In a desert wasteland, a rebel and a drifter flee a tyrant in a relentless chase.','#d35400','#f39c12'],
+[8,'La La Land',2016,'Romance',8.0,128,'Damien Chazelle','Ryan Gosling, Emma Stone, John Legend','A pianist and an aspiring actress chase their dreams in Los Angeles.','#614385','#516395'],
+[9,'Get Out',2017,'Horror',7.7,104,'Jordan Peele','Daniel Kaluuya, Allison Williams, Bradley Whitford','A young man visiting his girlfriend\'s family uncovers a disturbing secret.','#1d2b64','#c06c84'],
+[10,'Toy Story',1995,'Animation',8.3,81,'John Lasseter','Tom Hanks, Tim Allen, Don Rickles','A cowboy doll feels threatened when a flashy space ranger joins the toy box.','#2193b0','#6dd5ed'],
+[11,'The Shawshank Redemption',1994,'Drama',9.3,142,'Frank Darabont','Tim Robbins, Morgan Freeman, Bob Gunton','Two imprisoned men bond over years, finding hope through small acts of decency.','#373b44','#4286f4'],
+[12,'The Conjuring',2013,'Horror',7.5,112,'James Wan','Vera Farmiga, Patrick Wilson, Lili Taylor','Paranormal investigators help a family terrorized by a dark presence.','#200122','#6f0000']
+].map(a=>({id:a[0],t:a[1],y:a[2],g:a[3],r:a[4],m:a[5],d:a[6],c:a[7],o:a[8],c1:a[9],c2:a[10]}));
+const GEN=['All',...new Set(D.map(m=>m.g))];
+
+let S={user:null,favs:[],reviews:{},theme:'dark'},q='',genre='All',signup=false;
+try{Object.assign(S,JSON.parse(localStorage.getItem('cinema')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('cinema',JSON.stringify(S))}catch(e){}};
+const go=p=>location.hash=p;
+const toast=t=>{const e=$('#toast');e.textContent=t;e.className='show';setTimeout(()=>e.className='',1800)};
+const isFav=id=>S.favs.includes(id);
+const poster=(m,sm)=>`<div class="poster${sm?' sm':''}" style="background:linear-gradient(135deg,${m.c1},${m.c2})"><span>🎬</span>${sm?'':`<b>${m.t}</b>`}</div>`;
+const stars=n=>'⭐ '+Number(n).toFixed(1);
+
+function fav(id){S.favs=isFav(id)?S.favs.filter(x=>x!==id):[...S.favs,id];save();route()}
+
+function card(m,i){return `<div class="card" style="animation-delay:${i*50}ms" onclick="go('/movie/${m.id}')">${poster(m)}
+<button class="heart ${isFav(m.id)?'on':''}" onclick="event.stopPropagation();fav(${m.id})">${isFav(m.id)?'♥':'♡'}</button>
+<div class="ci"><b>${m.t}</b><small>⭐ ${m.r} • ${m.y}</small></div></div>`}
+
+function grid(){const l=D.filter(m=>(genre==='All'||m.g===genre)&&m.t.toLowerCase().includes(q.toLowerCase()));
+ return l.length?l.map(card).join(''):'<div class="empty" style="grid-column:1/-1">No movies found 🎬</div>'}
+
+function shell(content,tab){
+ const t=(k,i,l)=>`<a class="${tab===k?'on':''}" onclick="go('/${k}')"><span>${i}</span>${l}</a>`;
+ return `<div class="shell"><nav><div class="logo">🎬</div>${t('home','🧭','Explore')}${t('fav','❤️','Favorites')}${t('profile','👤','Profile')}</nav><main>${content}</main></div>`}
+
+function explore(){
+ const f=[...D].sort((a,b)=>b.r-a.r)[0];
+ return shell(`<h1>CINEMA</h1><p>Hi ${esc(S.user.name)} 👋</p>
+ <div class="banner" style="background:linear-gradient(135deg,${f.c1},${f.c2})" onclick="go('/movie/${f.id}')"><span class="tag">⭐ Top Rated</span><h2>${f.t}</h2><span>${f.g} • ${f.y} • ${f.r}/10</span></div>
+ <input class="inp" style="margin:16px 0 0" placeholder="🔍 Search movies..." value="${esc(q)}" oninput="q=this.value;$('#grid').innerHTML=grid()">
+ <div class="chips">${GEN.map(g=>`<span class="chip ${g===genre?'on':''}" onclick="genre='${g}';route()">${g}</span>`).join('')}</div>
+ <div class="grid" id="grid">${grid()}</div>`,'home')}
+
+function favorites(){
+ const l=D.filter(m=>isFav(m.id));
+ return shell(`<h1>FAVORITES</h1>`+(l.length?l.map(m=>`<div class="row" onclick="go('/movie/${m.id}')">${poster(m,1)}<div><b>${m.t}</b><br><small>${m.g} • ${m.y} • ⭐ ${m.r}</small></div><button class="x" title="Remove" onclick="event.stopPropagation();fav(${m.id})">🗑️</button></div>`).join(''):'<div class="empty">💔<br>No favorites yet. Tap ♥ on any movie!</div>'),'fav')}
+
+function profile(){
+ const rc=Object.values(S.reviews).reduce((a,b)=>a+b.length,0);
+ return shell(`<h1>PROFILE</h1><div style="max-width:500px;margin:auto">
+ <div class="panel" style="text-align:center"><div style="font-size:60px">👤</div><h2 style="margin:0">${esc(S.user.name)}</h2><span class="mut">${esc(S.user.email)}</span></div>
+ <div class="stats"><div class="panel">❤️<br>${S.favs.length}<br><small>Favorites</small></div><div class="panel">📝<br>${rc}<br><small>Reviews</small></div></div>
+ <button class="btn ghost" style="width:100%;margin-bottom:12px" onclick="toggleTheme()">${S.theme==='dark'?'☀️ Switch to Light Mode':'🌙 Switch to Dark Mode'}</button>
+ <button class="btn" style="width:100%" onclick="logout()">Log out</button></div>`,'profile')}
+
+function details(id){
+ const m=D.find(x=>x.id==id);if(!m)return shell('<div class="empty">Movie not found</div>','home');
+ const rv=S.reviews[id]||[];
+ return shell(`<button class="btn ghost" onclick="history.back()">← Back</button>
+ <div class="det panel">${poster(m)}<div>
+  <h1 style="letter-spacing:0">${m.t}</h1>
+  <span class="pill">${m.g}</span><span class="pill">${m.y}</span><span class="pill">${m.m} min</span><span class="pill">⭐ ${m.r}/10</span>
+  <p>${m.o}</p><p><b>Director:</b> ${m.d}</p><p>${m.c.split(', ').map(c=>`<span class="pill">${c}</span>`).join('')}</p>
+  <button class="btn ${isFav(m.id)?'on':''}" onclick="fav(${m.id})">${isFav(m.id)?'♥ In Favorites':'♡ Add to Favorites'}</button>
+ </div></div>
+ <h2>Reviews (${rv.length})</h2>
+ <form class="panel" onsubmit="addReview(event,${id})" novalidate>
+  <b>Write a review</b><br><br>
+  <label>Your name</label><input class="inp" id="rn" value="${esc(S.user.name)}"><span class="err" id="e1"></span>
+  <label>Rating: <b id="rv">4.0</b></label><input type="range" id="rs" min="1" max="5" step="0.5" value="4" style="width:100%;accent-color:var(--br)" oninput="$('#rv').textContent=(+this.value).toFixed(1)">
+  <label>Comment</label><textarea class="inp" id="rc" rows="3"></textarea><span class="err" id="e2"></span>
+  <button class="btn">Submit Review</button>
+ </form>
+ ${rv.map(r=>`<div class="panel" style="animation:fade .4s"><b>${esc(r.n)}</b> <span style="float:right">${stars(r.s)}</span><p style="margin:6px 0 0">${esc(r.c)}</p></div>`).join('')}`,'home')}
+
+function addReview(e,id){e.preventDefault();
+ const n=$('#rn').value.trim(),c=$('#rc').value.trim();let ok=true;
+ $('#e1').textContent=n?'':(ok=false,'Name is required');
+ $('#e2').textContent=c.length>=10?'':(ok=false,'Comment must be at least 10 characters');
+ if(!ok)return;
+ (S.reviews[id]=S.reviews[id]||[]).unshift({n,c,s:+$('#rs').value});save();route();toast('Review submitted ✅')}
+
+function login(){return `<div class="login"><form class="panel" onsubmit="doLogin(event)" novalidate>
+ <div style="text-align:center;font-size:52px">🎬</div><h1 style="text-align:center;letter-spacing:6px">CINEMA</h1>
+ <p style="text-align:center" class="mut">${signup?'Create your account':'Welcome back'}</p>
+ ${signup?`<label>Full name</label><input class="inp" id="ln"><span class="err" id="e0"></span>`:''}
+ <label>Email</label><input class="inp" id="le" type="email"><span class="err" id="e1"></span>
+ <label>Password</label><input class="inp" id="lp" type="password"><span class="err" id="e2"></span>
+ <button class="btn" style="width:100%">${signup?'Sign Up':'Sign In'}</button><br><br>
+ <a style="cursor:pointer;color:var(--br)" onclick="signup=!signup;route()">${signup?'Already have an account? Sign in':'New here? Create an account'}</a></form></div>`}
+
+function doLogin(e){e.preventDefault();let ok=true;
+ const n=signup?$('#ln').value.trim():'',em=$('#le').value.trim(),p=$('#lp').value;
+ if(signup)$('#e0').textContent=n.length>=3?'':(ok=false,'Name must be at least 3 characters');
+ $('#e1').textContent=/^[\w.+-]+@[\w-]+\.[\w.]+$/.test(em)?'':(ok=false,em?'Enter a valid email':'Email is required');
+ $('#e2').textContent=p.length>=6?'':(ok=false,'Password must be at least 6 characters');
+ if(!ok)return;
+ S.user={name:n||em.split('@')[0],email:em};save();go('/home');route()}
+
+function logout(){S.user=null;S.favs=[];save();go('/');route()}
+function toggleTheme(){S.theme=S.theme==='dark'?'light':'dark';save();route()}
+
+function route(){
+ document.documentElement.dataset.theme=S.theme;
+ const h=location.hash.slice(1)||'/';
+ if(!S.user){$('#app').innerHTML=login();return}
+ let v;
+ if(h.startsWith('/movie/'))v=details(h.split('/')[2]);
+ else if(h==='/fav')v=favorites();
+ else if(h==='/profile')v=profile();
+ else v=explore();
+ $('#app').innerHTML=v;window.scrollTo(0,0)
+}
+addEventListener('hashchange',route);route();
+</script>
+</body>
+</html>
